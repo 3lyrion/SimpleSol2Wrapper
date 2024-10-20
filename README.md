@@ -70,9 +70,9 @@ Lua::Object findWeapon(const string& name, Lua::Object container)
 
 struct Human
 {
-	using WeaponPtr = unique_ptr<Weapon>;
+	using WeaponPtr = std::unique_ptr<Weapon>;
 
-	vector<WeaponPtr> sharedWeapons;
+	std::vector<WeaponPtr> sharedWeapons;
 
 	void registerLua()
 	{
@@ -101,6 +101,11 @@ struct Human
 
 int main()
 {
+	Weapon::bindLua();
+
+	Human human;
+	human.registerLua();
+
 	auto utility = lua.createStaticObject("util");
 	utility.setMethod("findWeapon", findWeapon);
 
