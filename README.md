@@ -29,7 +29,7 @@ int main()
 }
 ```
 
-**Example №2**
+**Case 2**
 ```cpp
 class Weapon
 {
