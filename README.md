@@ -22,10 +22,10 @@ int main()
 
 	lua.exec("test:hi()");
 
-    Lua::Object result = lua.execFile ("Data/MyScript.lua")
-    int num = result.as<int>();
+	Lua::Object result = lua.execFile ("Data/MyScript.lua")
+	int num = result.as<int>();
 
-    return 0;
+	return 0;
 }
 ```
 
@@ -101,19 +101,19 @@ struct Human
 
 int main()
 {
-    auto utility = lua.createStaticObject("util");
+	auto utility = lua.createStaticObject("util");
 	utility.setMethod("findWeapon", findWeapon);
 
-    lua.exec(R"(
-        local weapons = Player:getSharedWeapons()
+	lua.exec(R"(
+		local weapons = Player:getSharedWeapons()
 
-        local wpn1  = weapons[0]
-        wpn1.damage = 100
+		local wpn1  = weapons[0]
+		wpn1.damage = 100
 
-        local wpn  = util:findWeapon('Rifle', weapons)
-    )");
+		local wpn  = util:findWeapon('Rifle', weapons)
+	)");
 
-    return 0;
+	return 0;
 }
 ```
 
