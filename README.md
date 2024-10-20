@@ -117,7 +117,7 @@ int main()
 		local wpn1  = weapons[0]
 		wpn1.damage = 100
 
-		local wpn  = util:findWeapon('Rifle', weapons)
+		local wpn2 = util:findWeapon('Rifle', weapons)
 	)");
 
 	return 0;
