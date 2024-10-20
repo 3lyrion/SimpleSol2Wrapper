@@ -65,7 +65,7 @@ public:
 				m_table.set_function(name, value);
 
 			else
-				m_table.set_function(name, function(value));
+				m_table.set_function(name, std::function(value));
 		}
 
 		constexpr void setField(const std::string& name, auto&& value)
