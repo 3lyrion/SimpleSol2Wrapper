@@ -22,7 +22,7 @@ int main()
 
 	lua.exec("test:hi()");
 
-	Lua::Object result = lua.execFile ("Data/MyScript.lua")
+	Lua::Object result = lua.execFile("Data/MyScript.lua")
 	int num = result.as<int>();
 
 	return 0;
@@ -55,19 +55,6 @@ private:
 	int         m_damage;
 };
 
-Lua::Object findWeapon(const string& name, Lua::Object container)
-{
-	LUA_GET();
-
-	std::vector<Weapon> weapons = container;
-
-	for (const auto& wpn : weapons)
-	{
-		if (wpn.getName() == name)
-			return lua.toLuaObject(wpn);
-	}
-}
-
 struct Human
 {
 	using WeaponPtr = std::unique_ptr<Weapon>;
@@ -98,6 +85,21 @@ struct Human
 		);
 	}
 };
+
+Lua::Object findWeapon(const string& name, Lua::Object container)
+{
+	LUA_GET();
+
+	std::vector<Weapon> weapons = container;
+
+	for (const auto& wpn : weapons)
+	{
+		if (wpn.getName() == name)
+			return lua.toLuaObject(wpn);
+	}
+
+	return lua.toLuaObject(lua.nil);
+}
 
 int main()
 {
