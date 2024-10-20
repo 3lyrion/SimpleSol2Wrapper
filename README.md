@@ -84,7 +84,7 @@ struct Human
 
 		player.setMethod("getSharedWeapons", [this, &lua] // -> vector<Lua::Object>
 			{
-				vector<Lua::Object> luaWpns;
+				std::vector<Lua::Object> luaWpns;
 
 				for (auto& wpn : sharedWeapons)
 				{
