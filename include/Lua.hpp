@@ -45,7 +45,7 @@ SOFTWARE.
 
 #define LUA_GET auto& lua = Lua::get
 
-class Lua : public NonCopyable
+class Lua
 {
 public:
 	using Object = sol::object;
@@ -56,19 +56,19 @@ public:
 	class Table
 	{
 	public:
-		Table(sol::table const& table) :
+		Table(const sol::table& table) :
 			m_table(table) { }
 
-		constexpr void setMethod(string const& name, auto&& value)
+		constexpr void setMethod(const std::string& name, auto&& value)
 		{
-			if constexpr (is_function<decltype(value)>::value)
+			if constexpr (std::is_function<decltype(value)>::value)
 				m_table.set_function(name, value);
 
 			else
 				m_table.set_function(name, function(value));
 		}
 
-		constexpr void setField(string const& name, auto&& value)
+		constexpr void setField(const std::string& name, auto&& value)
 		{
 			m_table[name] = value;
 		}
@@ -81,10 +81,10 @@ public:
 	class Class
 	{
 	public:
-		Class(sol::usertype<T> const& usertype) :
+		Class(const sol::usertype<T>& usertype) :
 			m_usertype(usertype) { }
 
-		constexpr void set(string const& name, auto&& value)
+		constexpr void set(const std::string& name, auto&& value)
 		{
 			m_usertype[name] = value;
 		}
@@ -100,20 +100,20 @@ public:
 		return instance;
 	}
 
-	Lua(Lua const&)              = delete;
-	Lua& operator = (Lua const&) = delete;
+	Lua(const Lua&)              = delete;
+	Lua& operator = (const Lua&) = delete;
 
 	~Lua()
 	{
 		m_view.collect_garbage();
 	}
 	
-	Table createStaticObject(string const& name)
+	Table createStaticObject(const std::string& name)
 	{
 		return m_view[name].get_or_create<sol::table>();
 	}
 
-	Table createObject(string const& name = "")
+	Table createObject(const std::string& name = "")
 	{
 		if (!name.empty()) return m_view.create_named_table(name);
 
@@ -121,7 +121,7 @@ public:
 	}
 
 	template <typename YourClass>
-	constexpr Class<YourClass> bindClass(string const& name)
+	constexpr Class<YourClass> bindClass(const std::string& name)
 	{
 		return m_view.new_usertype<YourClass>(name);
 	}
@@ -131,12 +131,12 @@ public:
 		return sol::make_object(m_view.lua_state(), object);
 	}
 
-	inline Object exec(string const& script)
+	inline Object exec(const std::string & script)
 	{
 		return m_view.script(script);
 	}
 	
-	inline Object execFile(string const& path)
+	inline Object execFile(const std::string& path)
 	{
 		return m_view.script_file(path);
 	}
