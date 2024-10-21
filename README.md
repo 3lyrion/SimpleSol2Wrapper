@@ -25,6 +25,8 @@ int main()
 	Lua::Object result = lua.execFile("Data/MyScript.lua")
 	int num = result.as<int>();
 
+	lua.shutdown();
+
 	return 0;
 }
 ```
@@ -119,6 +121,8 @@ int main()
 
 		local wpn2 = util:findWeapon('Rifle', weapons)
 	)");
+
+	lua.shutdown();
 
 	return 0;
 }
