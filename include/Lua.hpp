@@ -65,7 +65,7 @@ public:
 				m_table.set_function(name, value);
 
 			else
-				m_table.set_function(name, std::function(value));
+				m_table.set_function(name, function(value));
 		}
 
 		constexpr void setField(const std::string& name, auto&& value)
@@ -103,17 +103,17 @@ public:
 	Lua(const Lua&)              = delete;
 	Lua& operator = (const Lua&) = delete;
 
-	~Lua()
+	inline void shutdown()
 	{
 		m_view.collect_garbage();
 	}
 	
-	Table createStaticObject(const std::string& name)
+	inline Table createStaticObject(const std::string& name)
 	{
 		return m_view[name].get_or_create<sol::table>();
 	}
 
-	Table createObject(const std::string& name = "")
+	inline Table createObject(const std::string& name = "")
 	{
 		if (!name.empty()) return m_view.create_named_table(name);
 
@@ -131,7 +131,7 @@ public:
 		return sol::make_object(m_view.lua_state(), object);
 	}
 
-	inline Object exec(const std::string & script)
+	inline Object exec(const std::string& script)
 	{
 		return m_view.script(script);
 	}
@@ -153,5 +153,7 @@ private:
 	{
 		m_view.open_libraries();
 	}
+
+	~Lua() { }
 };
 
