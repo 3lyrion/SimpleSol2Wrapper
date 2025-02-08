@@ -14,10 +14,10 @@
 ██████╔╝╚█████╔╝███████╗███████╗  ░░╚██╔╝░╚██╔╝░██║░░██║██║░░██║██║░░░░░██║░░░░░███████╗██║░░██║
 ╚═════╝░░╚════╝░╚══════╝╚══════╝  ░░░╚═╝░░░╚═╝░░╚═╝░░╚═╝╚═╝░░╚═╝╚═╝░░░░░╚═╝░░░░░╚══════╝╚═╝░░╚═╝
 
-Header-only C++20 simple sol2 wrapper https://github.com/Mouseunder/SimpleSol2Wrapper
+Header-only C++20 simple sol2 wrapper https://github.com/3lyrion/SimpleSol2Wrapper
 
 Licensed under the MIT License <http://opensource.org/licenses/MIT>.
-Copyright (c) 2024 Mouseunder
+Copyright (c) 2025 3lyrion
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files( the "Software" ), to deal
@@ -43,7 +43,12 @@ SOFTWARE.
 
 #include <sol/sol.hpp>
 
-#define LUA_GET auto& lua = Lua::get
+#define LUA_GET auto& lua = el::Lua::get
+
+#define LUA_SELF el::Lua::Object _self
+
+namespace el
+{
 
 class Lua
 {
@@ -56,21 +61,21 @@ public:
 	class Table
 	{
 	public:
-		Table(const sol::table& table) :
-			m_table(table) { }
+		explicit Table(sol::table&& table) :
+			m_table(std::move(table)) { }
 
-		constexpr void setMethod(const std::string& name, auto&& value)
+		constexpr void setMethod(std::string const& name, auto&& value)
 		{
 			if constexpr (std::is_function<decltype(value)>::value)
 				m_table.set_function(name, value);
 
 			else
-				m_table.set_function(name, function(value));
+				m_table.set_function(name, std::function(std::forward<decltype(value)>(value)));
 		}
 
-		constexpr void setField(const std::string& name, auto&& value)
+		constexpr void setField(std::string const& name, auto&& value)
 		{
-			m_table[name] = value;
+			m_table[name] = std::forward<decltype(value)>(value);
 		}
 
 	private:
@@ -81,62 +86,69 @@ public:
 	class Class
 	{
 	public:
-		Class(const sol::usertype<T>& usertype) :
-			m_usertype(usertype) { }
+		explicit Class(sol::usertype<T>&& usertype) :
+			m_usertype(std::move(usertype)) { }
 
-		constexpr void set(const std::string& name, auto&& value)
+		template <typename... Args>
+		constexpr void setConstructor()
 		{
-			m_usertype[name] = value;
+			m_usertype["new"] = sol::constructors<Args...>();
+		}
+
+		constexpr void set(std::string const& name, auto&& value)
+		{
+			m_usertype[name] = std::forward<decltype(value)>(value);
 		}
 
 	private:
 		sol::usertype<T> m_usertype;
 	};
 
+public:
 	inline static Lua& get()
 	{
 		static Lua instance;
-
 		return instance;
 	}
 
-	Lua(const Lua&)              = delete;
-	Lua& operator = (const Lua&) = delete;
+	Lua(Lua const&)              = delete;
+	Lua& operator = (Lua const&) = delete;
 
 	inline void shutdown()
 	{
-		m_view.collect_garbage();
-	}
-	
-	inline Table createStaticObject(const std::string& name)
-	{
-		return m_view[name].get_or_create<sol::table>();
+		m_view.open_libraries();
 	}
 
-	inline Table createObject(const std::string& name = "")
+	inline Table createStaticObject(std::string const& name)
 	{
-		if (!name.empty()) return m_view.create_named_table(name);
+		return Table(std::move(m_view[name].get_or_create<sol::table>()));
+	}
 
-		return m_view.create_table();
+	inline Table createObject(std::string const& name = "")
+	{
+		if (!name.empty())
+			return Table(std::move(m_view.create_named_table(name)));
+
+		return Table(std::move(m_view.create_table()));
 	}
 
 	template <typename YourClass>
-	constexpr Class<YourClass> bindClass(const std::string& name)
+	constexpr Class<YourClass> bindClass(std::string const& name)
 	{
-		return m_view.new_usertype<YourClass>(name);
+		return Class<YourClass>(std::move(m_view.new_usertype<YourClass>(name)));
 	}
 
 	constexpr Object toLuaObject(auto&& object)
 	{
-		return sol::make_object(m_view.lua_state(), object);
+		return sol::make_object(m_view.lua_state(), std::forward<decltype(object)>(object));
 	}
 
-	inline Object exec(const std::string& script)
+	inline Object exec(std::string const& script)
 	{
 		return m_view.script(script);
 	}
 	
-	inline Object execFile(const std::string& path)
+	inline Object execFile(std::string const& path)
 	{
 		return m_view.script_file(path);
 	}
@@ -154,6 +166,7 @@ private:
 		m_view.open_libraries();
 	}
 
-	~Lua() { }
+	~Lua() = default;
 };
 
+} // namespace el
