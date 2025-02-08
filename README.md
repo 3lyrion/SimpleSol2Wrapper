@@ -52,11 +52,9 @@ public:
 
 	Range() = default;
 
-	Range(T const& min_, T const& max_)
-	{
-		min = min_;
-		max = max_;
-	}
+	Range(T const& min_, T const& max_) :
+		min(min_),
+		max(max_) { }
 };
 
 using RangeI = Range<int>;
