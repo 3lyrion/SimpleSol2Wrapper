@@ -121,19 +121,19 @@ int main()
 	LPlayer.setField("weapon", pistol);
 	LPlayer.setField("arsenal", new std::vector<Weapon*>{ pistol });
 
-    auto utility = lua.createStaticObject("util");
+	auto utility = lua.createStaticObject("util");
 	utility.setMethod("findWeapon", findWeapon);
 
-    lua.exec(R"(
+	lua.exec(R"(
 		Player.arsenal:add(Weapon.new('Rifle', Range.new(20, 30)))
 		Player.weapon.damage.min = 5;
 
-        local wpn = util:findWeapon('Pistol', weapons)
-    )");
+		local wpn = util:findWeapon('Pistol', weapons)
+	)");
 
 	lua.shutdown();
 
-    return 0;
+	return 0;
 }
 ```
 
