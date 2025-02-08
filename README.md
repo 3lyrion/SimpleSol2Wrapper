@@ -71,7 +71,7 @@ public:
 		LUA_GET(); // auto& lua = el::Lua::get();
 
 		auto LWeapon = lua.bindClass<Weapon>("Weapon");
-		LWeapon.setConstructor<Weapon(std::string const&, int)>();
+		LWeapon.setConstructor<Weapon(std::string const&, RangeI)>();
 		LWeapon.set("damage",    &Weapon::m_damage);
 		LWeapon.set("getName",   &Weapon::getName);  // name is read-only
 	}
