@@ -79,8 +79,8 @@ public:
 		}
 	}
 
-	std::string const&	getName		() const { return m_name; }
-	int					getDamage	() const { return m_damage; }
+	std::string const& getName	() const { return m_name; }
+	int                getDamage	() const { return m_damage; }
 
 private:
 	inline static s_staticRegsCompleted = false;
