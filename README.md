@@ -32,12 +32,12 @@ int main()
 
 	lua.exec("test:hi()");
 
-    el::Lua::Object result = lua.execFile("Data/MyScript.lua");
-    int num = result.as<int>();
+	el::Lua::Object result = lua.execFile("Data/MyScript.lua");
+	int num = result.as<int>();
 
 	lua.shutdown();
 
-    return 0;
+	return 0;
 }
 ```
 
@@ -68,12 +68,17 @@ public:
 		m_name		(name),
 		m_damage	(damage)
 	{
-		LUA_GET(); // auto& lua = el::Lua::get();
+		if (!s_staticRegsCompleted)
+		{
+			s_staticRegsCompleted = true;
 
-		auto LWeapon = lua.bindClass<Weapon>("Weapon");
-		LWeapon.setConstructor<Weapon(std::string const&, RangeI)>();
-		LWeapon.set("damage",    &Weapon::m_damage);
-		LWeapon.set("getName",   &Weapon::getName);  // name is read-only
+			LUA_GET(); // auto& lua = el::Lua::get();
+
+			auto LWeapon = lua.bindClass<Weapon>("Weapon");
+			LWeapon.setConstructor<Weapon(std::string const&, RangeI)>();
+			LWeapon.set("damage",    &Weapon::m_damage);
+			LWeapon.set("getName",   &Weapon::getName);  // name is read-only
+		}
 	}
 
 	std::string const&	getName		() const { return m_name; }
