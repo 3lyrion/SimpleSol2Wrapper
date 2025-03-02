@@ -116,7 +116,16 @@ public:
 
 	inline void shutdown()
 	{
-		m_view.open_libraries();
+		m_view.collect_garbage();
+	}
+
+	constexpr void createFunction(std::string const& name, auto&& value)
+	{
+		if constexpr (std::is_function<decltype(value)>::value)
+			m_view.set_function(name, value);
+
+		else
+			m_view.set_function(name, std::function(std::forward<decltype(value)>(value)));
 	}
 
 	inline Table createStaticObject(std::string const& name)
@@ -126,10 +135,10 @@ public:
 
 	inline Table createObject(std::string const& name = "")
 	{
-		if (!name.empty())
-			return Table(std::move(m_view.create_named_table(name)));
-
-		return Table(std::move(m_view.create_table()));
+		if (name.empty())
+			return Table(std::move(m_view.create_table()));
+			
+		return Table(std::move(m_view.create_named_table(name)));
 	}
 
 	template <typename YourClass>
